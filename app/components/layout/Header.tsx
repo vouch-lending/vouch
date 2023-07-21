@@ -6,16 +6,19 @@ import Logo from '../icons/logo'
 import WorldCoin from '../icons/worldcoin'
 import { MetaMaskSDK } from '@metamask/sdk';
 import { formatAddress } from '@/utils/format'
+import Modal from '../common/Modal'
+import RequestModal from './RequestModal'
 
 const Header = () => {
   const [address, setAddress] = useState('')
+  const [modal, setModal] = useState(false)
 
   const connect = async () => {
     const options = {
       injectProvider: true,
-      dappMetadata: {name: "My Dapp", url: "https://mydapp.com"}	,
+      dappMetadata: { name: "My Dapp", url: "https://mydapp.com" },
     }
-    
+
     const MMSDK = new MetaMaskSDK(options)
 
     const ethereum = MMSDK.getProvider() // You can also access via window.ethereum
@@ -25,13 +28,21 @@ const Header = () => {
     if (addr && Array.isArray(addr) && addr.length > 0) setAddress(addr[0])
   }
 
-  const disconnect = () => {
-    setAddress('')
+  const disconnect = () => setAddress('')
+
+  const openModal = () => setModal(true)
+  const closeModal = () => setModal(false)
+
+  const submitRequestLoan = () => {
+    // amount, term, discord, telegram, twitter, description
   }
 
   // https://www.deepshot.ai/?ref=producthunt
   return (
     <header className="py-10">
+      <Modal title={'Request Loan'} isOpen={modal} closeModal={closeModal}>
+        <RequestModal />
+      </ Modal>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <nav className="relative z-50 flex justify-between">
           <div className="flex items-center md:gap-x-8">
@@ -54,6 +65,12 @@ const Header = () => {
                 href="/loans"
               >
                 Loans
+              </a>
+              <a
+                className="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer"
+                onClick={openModal}
+              >
+                Request Loan
               </a>
             </div>
           </div>
