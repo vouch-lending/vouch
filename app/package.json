@@ -11,6 +11,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.15",
     "@metamask/sdk": "^0.5.5",
+    "@sismo-core/sismo-connect-react": "^0.0.20",
     "@types/node": "20.4.2",
     "@types/react": "18.2.15",
     "@types/react-dom": "18.2.7",
