@@ -22,7 +22,15 @@ contract Vouch {
         bool isLoanRepaid;
     }
 
+    struct LoanStrings {
+        address borrower;
+        string twitter;
+        string telegram;
+        string desc;
+    }
+
     mapping(uint256 => Loan) public loans;
+    mapping(uint256 => LoanStrings) public loanstrings;
     uint256 public loanCount;
 
     mapping(address => uint256) public meritScores;
@@ -53,7 +61,7 @@ contract Vouch {
     }
 
     // Function to request a new loan (payable)
-    function requestLoan(uint256 _loanAmount, uint256 _loanDuration) external payable {
+    function requestLoan(uint256 _loanAmount, uint256 _loanDuration, string calldata _twitter, string calldata _desc, string calldata _telegram) external payable {
         require(_loanAmount > 0, "Loan amount must be greater than 0");
         require(_loanDuration == 7 || _loanDuration == 30 || _loanDuration == 90, "Invalid loan duration");
 
@@ -77,6 +85,11 @@ contract Vouch {
         newLoan.isLoanApproved = false;
         newLoan.isLoanRepaid = false;
 
+        LoanStrings storage newLoanString = loanstrings[loanCount];
+        newLoanString.borrower = msg.sender;
+        newLoanString.desc = _desc;
+        newLoanString.telegram = _telegram;
+        newLoanString.twitter = _twitter;
 
         // Set the loanIdOfBorrower mapping to store the loan ID for the borrower
         loanIdOfBorrower[msg.sender] = loanCount;
