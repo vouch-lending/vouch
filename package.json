@@ -9,6 +9,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^4.9.2",
     "@sismo-core/sismo-connect-react": "^0.0.20",
     "@sismo-core/sismo-connect-server": "^0.0.20",
     "wagmi": "^1.3.9"
