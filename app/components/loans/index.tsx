@@ -4,7 +4,7 @@ import Card from '../common/Card'
 const Loans: FC = () => {
   return (
     <div className="h-screen-minus">
-      <div className='flex items-center justify-between gap-8'>
+      {/* <div className='flex items-center justify-between gap-8'>
         <h1 className='text-l'>Active Loans</h1>
         <button
           className="hidden xs:inline-flex group items-center justify-center rounded-full py-2 px-4 text-sm font-semibold focus:outline-none focus-visible:outline-2
@@ -12,7 +12,7 @@ const Loans: FC = () => {
         >
           Request Loan
         </button>
-      </div>
+      </div> */}
       <Card />
     </div>
   )

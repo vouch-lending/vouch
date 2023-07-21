@@ -1,5 +1,4 @@
 import { FC } from 'react'
-import Logo from '../icons/logo'
 import Discord from '../icons/socials/discord'
 import Telegram from '../icons/socials/telegram'
 import Twitter from '../icons/socials/twitter'
@@ -16,7 +15,7 @@ const Card: FC = () => {
 
           <Blockies
             seed="0x8239123012347123o1239497914781"
-            size={14}
+            size={16}
             scale={3}
             color="#000"
             bgColor="#ffe"
@@ -26,25 +25,31 @@ const Card: FC = () => {
         </div>
 
         {/* second section */}
-        <div className='flex flex-col w-full'>
+        <div className='flex flex-col gap-2 w-full'>
           {/* top */}
           <div className='flex items-center justify-between'>
             <p>0x3782...28E1</p>
             <div className='flex items-center gap-2'>
-              <Discord />
-              <Telegram />
-              <Twitter />
+              <div className='bg-[#E0E0E0] p-1 rounded-full cursor-pointer'>
+                <Discord />
+              </div>
+              <div className='bg-[#E0E0E0] p-1 rounded-full cursor-pointer'>
+                <Telegram />              
+              </div>
+              <div className='bg-[#E0E0E0] p-1 rounded-full cursor-pointer'>
+                <Twitter />              
+              </div>
             </div>
           </div>
           {/* bottom */}
           <div className='flex justify-between w-full'>
-            <div className='flex items-center bg-black text-white px-4 rounded-full font-normal text-sm'>
+            <div className='flex items-center bg-[#E0E0E0] text-black px-4 rounded-full font-normal text-sm'>
               3.14%
             </div>
-            <div className='flex items-center bg-black text-white px-4 rounded-full font-normal text-sm'>
+            <div className='flex items-center bg-[#E0E0E0] text-black px-4 rounded-full font-normal text-sm'>
               7d Term
             </div>
-            <div className='flex items-center bg-black text-white px-4 rounded-full font-normal text-sm'>
+            <div className='flex items-center bg-[#E0E0E0] text-black px-4 rounded-full font-normal text-sm'>
               2d left
             </div>
           </div>

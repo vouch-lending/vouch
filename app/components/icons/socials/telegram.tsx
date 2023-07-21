@@ -9,8 +9,8 @@ const Telegram: FC = () => {
       </g>
       <defs>
         <linearGradient id="paint0_linear_318_61" x1="24" y1="0" x2="24" y2="47.644" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#2AABEE" />
-          <stop offset="1" stop-color="#229ED9" />
+          <stop stop-color="#000" />
+          <stop offset="1" stop-color="#000" />
         </linearGradient>
         <clipPath id="clip0_318_61">
           <rect width="48" height="48" fill="white" />
