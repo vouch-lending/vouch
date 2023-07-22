@@ -8,9 +8,14 @@ import { MetaMaskSDK } from '@metamask/sdk';
 import { formatAddress } from '@/utils/format'
 import Modal from '../common/Modal'
 import RequestModal from './RequestModal'
+import { CredentialType, IDKitWidget } from "@worldcoin/idkit";
+import type { ISuccessResult } from "@worldcoin/idkit";
+import type { VerifyReply } from "../../pages/api/verify";
+import Link from 'next/link'
 
 const Header = () => {
   const [address, setAddress] = useState('')
+  const [proof, setProof] = useState<ISuccessResult | undefined>()
   const [modal, setModal] = useState(false)
 
   const connect = async () => {
@@ -33,7 +38,38 @@ const Header = () => {
   const openModal = () => setModal(true)
   const closeModal = () => setModal(false)
 
-  // https://www.deepshot.ai/?ref=producthunt
+  const onSuccess = (result: ISuccessResult) => {
+    // This is where you should perform frontend actions once a user has been verified, such as redirecting to a new page
+    // window.alert("Successfully verified with World ID! Your nullifier hash is: " + result.nullifier_hash);
+    setProof(result)
+  };
+
+  const handleProof = async (result: ISuccessResult) => {
+    console.log("Proof received from IDKit:\n", JSON.stringify(result)); // Log the proof from IDKit to the console for visibility
+    const reqBody = {
+      merkle_root: result.merkle_root,
+      nullifier_hash: result.nullifier_hash,
+      proof: result.proof,
+      credential_type: result.credential_type,
+      action: process.env.NEXT_PUBLIC_WLD_ACTION_NAME,
+      signal: "",
+    };
+    console.log("Sending proof to backend for verification:\n", JSON.stringify(reqBody)) // Log the proof being sent to our backend for visibility
+    const res: Response = await fetch("/api/verify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(reqBody),
+    })
+    const data: VerifyReply = await res.json()
+    if (res.status == 200) {
+      console.log("Successful response from backend:\n", data); // Log the response from our backend for visibility
+    } else {
+      throw new Error(`Error code ${res.status} (${data.code}): ${data.detail}` ?? "Unknown error."); // Throw an error if verification fails
+    }
+  };
+
   return (
     <header className="py-10">
       <Modal title={'Request Loan'} isOpen={modal} closeModal={closeModal}>
@@ -44,24 +80,24 @@ const Header = () => {
           <div className="flex items-center md:gap-x-8">
             <Logo />
             <div className="hidden md:flex md:gap-x-6">
-              <a
+              <Link
                 className="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                 href="/"
               >
                 About
-              </a>
-              <a
+              </Link>
+              <Link
                 className="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                 href="/dashboard"
               >
                 Dashboard
-              </a>
-              <a
+              </Link>
+              <Link
                 className="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                 href="/loans"
               >
                 Loans
-              </a>
+              </Link>
               <a
                 className="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer"
                 onClick={openModal}
@@ -72,12 +108,30 @@ const Header = () => {
           </div>
           <div className="flex items-center gap-x-5 md:gap-x-8">
             <div className="hidden md:block">
-              <button
+              {proof ? <button
                 className="flex items-center gap-3 rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 "
               >
                 <WorldCoin />
-                Sign in
-              </button>
+                <span className='text-green-700'>Verified!</span>
+              </button> : <IDKitWidget
+                action={process.env.NEXT_PUBLIC_WLD_ACTION_NAME!}
+                app_id={process.env.NEXT_PUBLIC_WLD_APP_ID!}
+                onSuccess={onSuccess}
+                handleVerify={handleProof}
+                credential_types={[CredentialType.Orb, CredentialType.Phone]}
+                autoClose
+              >
+                {({ open }) =>
+                  <button
+                    className="flex items-center gap-3 rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 "
+                    onClick={open}
+                  >
+                    <WorldCoin />
+                    Sign in
+                  </button>
+                }
+              </IDKitWidget>}
+
             </div>
             <button
               className="hidden xs:inline-flex group items-center justify-center rounded-full py-2 px-4 text-sm font-semibold focus:outline-none focus-visible:outline-2
@@ -113,15 +167,15 @@ const Header = () => {
                           onClick={close}
                         />
                         <div className="relative z-10 flex origin-top flex-col rounded-2xl bg-white p-4 text-lg tracking-tight text-slate-900 shadow-xl ring-1 ring-slate-900/5 opacity-100 scale-100 w-screen sm:mx-6 mx-4">
-                          <a className="block w-full p-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900" href="/about">
+                          <Link className="block w-full p-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900" href="/about">
                             About
-                          </a>
-                          <a className="block w-full p-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900" href="/dashboard">
+                          </Link>
+                          <Link className="block w-full p-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900" href="/dashboard">
                             Dashboard
-                          </a>
-                          <a className="block w-full p-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900" href="/loans">
+                          </Link>
+                          <Link className="block w-full p-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900" href="/loans">
                             Loans
-                          </a>
+                          </Link>
                         </div>
                       </Popover.Panel>
                     </Transition>
