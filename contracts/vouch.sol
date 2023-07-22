@@ -83,7 +83,8 @@ contract Vouch {
         {
             uint256 apr = 25;
             uint256 meritScore = meritScores[msg.sender];
-            newLoan.interestRate = 5 + (apr.mul(meritScore.sub(1))).div(99);
+            meritScore = meritScore.mul(99).div(100);
+            newLoan.interestRate = 5 + (apr.mul(99 - meritScore)).div(99);
         }
         newLoan.creationTime = block.timestamp;
         newLoan.repaymentTime = 0;
