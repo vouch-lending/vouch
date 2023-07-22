@@ -12,6 +12,7 @@ contract Vouch {
         mapping(address => uint256) vouchedAmounts; // Track the vouch amount for each lender
         mapping(address => uint256) repaymentShares; // Track the repayment share for each lender
         uint256 loanAmount;
+        uint256 totalCommitted;
         uint256 lockedCollateral;
         uint256 loanDuration;
         uint256 interestRate;
@@ -63,11 +64,12 @@ contract Vouch {
     // Function to request a new loan (payable)
     function requestLoan(uint256 _loanAmount, uint256 _loanDuration, string calldata _twitter, string calldata _desc, string calldata _telegram) external payable {
         require(_loanAmount > 0, "Loan amount must be greater than 0");
+        require(_loanAmount.div(2) == msg.value, "Loan amount and amount sent do not match"); 
         require(_loanDuration == 7 || _loanDuration == 30 || _loanDuration == 90, "Invalid loan duration");
 
         // Ensure the requested loan amount does not exceed 2 times the deposited collateral
-        uint256 maxLoanAmount = depositedCollateral[msg.sender].mul(2);
-        require(_loanAmount <= maxLoanAmount, "Loan amount exceeds collateral");
+        // uint256 maxLoanAmount = depositedCollateral[msg.sender].mul(2);
+        // require(_loanAmount <= maxLoanAmount, "Loan amount exceeds collateral");
 
         // Lock up 50% of the requested loan amount as collateral
         uint256 lockedCollateral = _loanAmount.div(2);
@@ -76,6 +78,7 @@ contract Vouch {
         Loan storage newLoan = loans[loanCount];
         newLoan.borrower = msg.sender;
         newLoan.loanAmount = _loanAmount;
+        newLoan.totalCommitted = 0;
         newLoan.lockedCollateral = lockedCollateral;
         newLoan.loanDuration = _loanDuration;
         newLoan.interestRate = 5;
@@ -114,35 +117,45 @@ contract Vouch {
 
 
     // Function for a lender to vouch for a borrower with a specific amount
-    function vouch(uint256 _loanId, uint256 _amount) external {
+    function vouch(uint256 _loanId, uint256 _amount) external payable {
         require(_loanId < loanCount, "Invalid loan ID");
         require(_amount > 0, "Vouched amount must be greater than 0");
+        require(_amount == msg.value, "Amount sent doesn't match amount inputted");
 
         Loan storage loan = loans[_loanId];
-        require(loan.isLoanApproved, "Loan is not approved");
-        require(!loan.isLoanRepaid, "Loan is already repaid");
+        // require(loan.isLoanApproved, "Loan is not approved");
+        require(!loan.isLoanApproved, "Loan is already repaid");
 
         // Transfer the vouched amount to the contract
-        require(msg.sender != loan.borrower, "Borrower cannot vouch for their own loan");
+        // require(msg.sender != loan.borrower, "Borrower cannot vouch for their own loan");
         require(loan.vouchedAmounts[msg.sender] == 0, "You have already vouched for this loan");
 
         // Update the loan amount with the vouched amount
-        loan.loanAmount = loan.loanAmount.add(_amount);
+        loan.totalCommitted = loan.totalCommitted.add(_amount);
 
         // Add the vouched amount for the lender
         loan.vouchedAmounts[msg.sender] = _amount;
+
+        // TODO: check if total commited == loanAmount, if so, approve loan
+        if (loan.totalCommitted == loan.loanAmount) {
+            approveLoan(_loanId);
+        }
     }
 
     // Function to approve a loan after successful vouches
-    function approveLoan(uint256 _loanId) external {
+    function approveLoan(uint256 _loanId) internal {
         require(_loanId < loanCount, "Invalid loan ID");
         Loan storage loan = loans[_loanId];
         require(!loan.isLoanApproved, "Loan is already approved");
-        require(!loanRequestCancelled[loan.borrower], "Loan request is cancelled");
 
         // Perform any logic to check if the loan is approved (e.g., based on vouches)
+        loan.repaymentTime = block.timestamp + (loan.loanDuration * 1 days);
+        loan.repaymentAmount = loan.loanAmount.add(loan.loanAmount.mul(loan.interestRate).div(100));
 
         loan.isLoanApproved = true;
+
+        address payable receiver = payable(loan.borrower);
+        receiver.transfer(loan.loanAmount);
 
         // Emit an event to notify about the loan approval
         emit LoanApproved(_loanId);
