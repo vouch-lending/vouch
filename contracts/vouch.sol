@@ -1,11 +1,83 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.17;
 
 // Import the SafeMath library
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@sismo-core/sismo-connect-solidity/contracts/libs/SismoLib.sol";
 
-contract Vouch {
+import "hardhat/console.sol";
+
+contract Vouch is SismoConnect{
     using SafeMath for uint256; // Apply SafeMath to all uint256 types
+    event ResponseVerified(SismoConnectVerifiedResult result);
+    bytes16 public constant GITCOIN_PASSPORT_HOLDERS_GROUP_ID = 0x1cde61966decb8600dfd0749bd371f12;
+    bytes16 private _appId = 0xca946189a01488876ae4b4649e26d249;
+    bool private _isImpersonationMode = true;
+
+    constructor()
+        SismoConnect(
+            buildConfig({
+                // replace with your appId from the Sismo factory https://factory.sismo.io/
+                // should match the appId used to generate the response in your frontend
+                appId: _appId,
+                // For development purposes insert when using proofs that contains impersonation
+                // Never use this in production
+                isImpersonationMode: _isImpersonationMode
+            })
+        )
+    {}
+
+    function verifySismoConnectResponse(bytes memory response) public {
+        // build the auth and claim requests that should match the response
+        AuthRequest[] memory auths = new AuthRequest[](4);
+        auths[0] = _authRequestBuilder.build({authType: AuthType.EVM_ACCOUNT});
+        auths[1] = _authRequestBuilder.build({
+            authType: AuthType.EVM_ACCOUNT,
+            userId: uint160(0xA4C94A6091545e40fc9c3E0982AEc8942E282F38)
+        });
+        auths[2] = _authRequestBuilder.build({
+            authType: AuthType.TWITTER,
+            userId: 295218901,
+            isOptional: true,
+            isSelectableByUser: false
+        });
+        auths[3] = _authRequestBuilder.build({
+            authType: AuthType.TELEGRAM,
+            userId: 875608110,
+            isOptional: true,
+            isSelectableByUser: false
+        });
+
+
+        ClaimRequest[] memory claims = new ClaimRequest[](2);
+        // ENS DAO Voters
+        claims[0] = buildClaim({groupId: 0x85c7ee90829de70d0d51f52336ea4722});
+        // Gitcoin passport with at least a score of 15
+        claims[1] = buildClaim({
+            groupId: 0x1cde61966decb8600dfd0749bd371f12,
+            value: 15,
+            claimType: ClaimType.GTE
+        });
+
+        // verify the response regarding our original request
+        SismoConnectVerifiedResult memory result = verify({
+            responseBytes: response,
+            auths: auths,
+            claims: claims,
+            signature: _signatureBuilder.build({message: abi.encode("I love Sismo!")})
+        });
+
+        uint256 vaultId = SismoConnectHelper.getUserId(result, AuthType.VAULT);
+        uint256 telegramId = SismoConnectHelper.getUserId(result, AuthType.TELEGRAM);
+        uint256[] memory evmAccountIds = SismoConnectHelper.getUserIds(result, AuthType.EVM_ACCOUNT);
+        
+        console.log("Vault ID: %s", vaultId);
+        console.log("Telegram ID: %s", telegramId);
+        console.log("First EVM Account ID: %s", evmAccountIds[0]);
+        console.log("Second EVM Account ID: %s", evmAccountIds[1]);
+
+        emit ResponseVerified(result);
+    }
 
     struct Loan {
         address borrower;
