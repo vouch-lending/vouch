@@ -3,6 +3,7 @@ import { Loans } from "@/types";
 import MetaMaskSDK from "@metamask/sdk";
 import { BrowserProvider, ethers } from "ethers";
 import { FC, useState } from "react"
+import { toast } from "react-toastify";
 
 interface Props {
   loan: Loans
@@ -29,7 +30,18 @@ const VouchModal: FC<Props> = ({ loan }) => {
 
     const result = await contractInstance.vouch(loan.id, ethers.parseEther(inputAmount), { value: ethers.parseEther(inputAmount)});
 
-    console.log(result.hash)
+    toast.success(
+      <div>Transaction sent successfully! <a href={`https://celoscan.io/tx/${result.hash}`} className="underline">View here</a>.</div>
+      , {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
   }
 
   return (

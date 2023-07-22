@@ -12,6 +12,8 @@ import { CredentialType, IDKitWidget } from "@worldcoin/idkit";
 import type { ISuccessResult } from "@worldcoin/idkit";
 import type { VerifyReply } from "../../pages/api/verify";
 import Link from 'next/link'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Header = () => {
   const [address, setAddress] = useState('')
@@ -30,7 +32,21 @@ const Header = () => {
 
     const addr = await ethereum.request({ method: 'eth_requestAccounts', params: [] })
 
-    if (addr && Array.isArray(addr) && addr.length > 0) setAddress(addr[0])
+    if (addr && Array.isArray(addr) && addr.length > 0) { 
+      setAddress(addr[0]) 
+      toast.success(
+        <div>Wallet successfully connected!</div>
+        , {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+    }
   }
 
   const disconnect = () => setAddress('')
@@ -42,6 +58,16 @@ const Header = () => {
     // This is where you should perform frontend actions once a user has been verified, such as redirecting to a new page
     // window.alert("Successfully verified with World ID! Your nullifier hash is: " + result.nullifier_hash);
     setProof(result)
+    toast.success('You have been verified successfully!', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
   };
 
   const handleProof = async (result: ISuccessResult) => {
@@ -75,6 +101,18 @@ const Header = () => {
       <Modal title={'Request Loan'} isOpen={modal} closeModal={closeModal}>
         <RequestModal />
       </ Modal>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <nav className="relative z-50 flex justify-between">
           <div className="flex items-center md:gap-x-8">

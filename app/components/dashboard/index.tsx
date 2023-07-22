@@ -1,5 +1,5 @@
 import { VOUCH_ADDRESS, VOUCH_ABI } from '@/constants';
-import { Loans } from '@/types';
+import { Loans, LoansExtended } from '@/types';
 import MetaMaskSDK from '@metamask/sdk';
 import { BrowserProvider, ethers } from 'ethers';
 import { FC, useEffect, useState } from 'react'
@@ -8,7 +8,7 @@ import UserVouches from './UserVouches';
 
 const Dashboard: FC = () => {
   const [vouchedList, setVouchedList] = useState<Loans[] | undefined>()
-  const [loansList, setLoansList] = useState<Loans[] | undefined>()
+  const [loansList, setLoansList] = useState<LoansExtended[] | undefined>()
   const [meritScore, setMeritScore] = useState<number>(0)
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const Dashboard: FC = () => {
     const contractInstance = new ethers.Contract(VOUCH_ADDRESS, VOUCH_ABI, await provider.getSigner());
 
     let i = 0
-    let userLoans: Loans[] = []
+    let userLoans: LoansExtended[] = []
     while (true) {
       const loan = await contractInstance.loans(i);
       const loanStrings = await contractInstance.loanstrings(i);
@@ -64,6 +64,10 @@ const Dashboard: FC = () => {
           loanAmount: ethers.formatEther(loan[1].toString()),
           totalCommitted: ethers.formatEther(loan[2].toString()),
           description: loanStrings[3],
+          repaymentTime: loan[7],
+          repaymentAmount: loan[8],
+          isLoanApproved: loan[9],
+          isLoanRepaid: loan[10],
         })
       }
 
@@ -72,15 +76,22 @@ const Dashboard: FC = () => {
 
     if (userLoans.length > 0) setLoansList(userLoans)
 
-    const vouched = await contractInstance.getVouchedLoans(address[0])
-    if (vouched.length > 0) setVouchedList(vouched)
+    // let vouchedArray: Loans[] = []
+
+    // const vouched = await contractInstance.getVouchedLoans(address[0])
+    // vouched.map((loan) => {
+    //   vouchedArray.push()
+    // })
+
+    // console.log(vouched[0])
+    // if (vouched.length > 0) setVouchedList(vouched)
   }
 
   return (
     <div className="h-screen-minus flex flex-col gap-4">
       <h3 className='font-medium'>Your Merit Score: <span className='font-black'>{meritScore.toString()}</span></h3>
       {loansList && <UserLoans loanArray={loansList } />}
-      {vouchedList !== undefined && <UserVouches />}
+      {/* {vouchedList && <UserVouches vouchArray={vouchedList} />} */}
     </div>
   )
 }

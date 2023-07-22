@@ -2,6 +2,7 @@ import { FC, useState } from "react";
 import { MetaMaskSDK } from '@metamask/sdk';
 import { BrowserProvider, ethers } from "ethers";
 import { VOUCH_ABI, VOUCH_ADDRESS } from "@/constants";
+import { toast } from "react-toastify";
 
 const RequestModal: FC = () => {
   // Initialize state variables to store the input values
@@ -28,7 +29,18 @@ const RequestModal: FC = () => {
 
     const result = await contractInstance.requestLoan(ethers.parseEther(amountValue), 30, twitterValue, descriptionValue, telegramValue, { value: ethers.parseEther((parseInt(amountValue) / 2).toString()) });
     // const result = await contractInstance.loans(0)
-    console.log(result)
+    toast.success(
+      <div>Transaction sent successfully! <a href={`https://celoscan.io/tx/${result.hash}`} className="underline">View here</a>.</div>
+      , {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
   }
 
   return (

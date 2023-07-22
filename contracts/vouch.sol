@@ -81,7 +81,7 @@ contract Vouch {
         newLoan.lockedCollateral = lockedCollateral;
         newLoan.loanDuration = _loanDuration;
         {
-            uint256 apr = 25;
+            uint256 apr = 10;
             uint256 meritScore = meritScores[msg.sender];
             meritScore = meritScore.mul(99).div(100);
             newLoan.interestRate = 5 + (apr.mul(99 - meritScore)).div(99);

@@ -2,20 +2,58 @@ import { FC } from "react"
 import Blockies from 'react-blockies';
 import Telegram from "../icons/socials/telegram";
 import Twitter from "../icons/socials/twitter";
-import { Loans } from "@/types";
+import { LoansExtended } from "@/types";
 import { formatAddress } from "@/utils/format";
+import { VOUCH_ADDRESS, VOUCH_ABI } from "@/constants";
+import MetaMaskSDK from "@metamask/sdk";
+import { BrowserProvider, ethers } from "ethers";
+import { toast } from "react-toastify";
 
 interface Props {
-  loanArray: Loans[]
+  loanArray: LoansExtended[]
 }
 
 const UserLoans: FC<Props> = ({ loanArray }) => {
   const openURLInNewTab = (url: string) =>
-  window.open(url, '_blank');
+    window.open(url, '_blank');
+
+  const repayLoan = async (loan: LoansExtended) => {
+    const options = {
+      injectProvider: true,
+      dappMetadata: { name: "My Dapp", url: "https://mydapp.com" },
+    }
+
+    const MMSDK = new MetaMaskSDK(options)
+
+    const ethereum = MMSDK.getProvider()
+
+    await ethereum.request({ method: 'eth_requestAccounts', params: [] })
+
+    const provider = new BrowserProvider(ethereum as any);
+
+    const contractInstance = new ethers.Contract(VOUCH_ADDRESS, VOUCH_ABI, await provider.getSigner());
+
+    const result = await contractInstance.repayLoan(loan.id, { value: loan.repaymentAmount});
+    // const result = await contractInstance.loans(0)
+    
+    toast.success(
+      <div>Transaction sent successfully! <a href={`https://celoscan.io/tx/${result.hash}`} className="underline">View here</a>.</div>
+      , {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+  }
 
   return (
     <div className='grid grid-flow-col grid-cols-3'>
       {loanArray.map((loan) => {
+        if (loan.isLoanRepaid) return null
         return (
           <div className="flex flex-col w-80 p-3 outline rounded-xl h-auto">
             {/* header */}
@@ -77,10 +115,11 @@ const UserLoans: FC<Props> = ({ loanArray }) => {
               </div>
             </div>
             <p className='text-[#334155] text-xs font-normal pb-4'>{loan.description}</p>
-            <button className="group items-center justify-center rounded-full py-2 px-4 text-sm font-semibold focus:outline-none focus-visible:outline-2
-                focus-visible:outline-offset-2 bg-red-700 text-white hover:bg-cerise-red-700 hover:text-slate-100 active:bg-cerise-red-800 active:text-slate-300 focus-visible:outline-cerise-red-900"
+            <button className={`group items-center justify-center rounded-full py-2 px-4 text-sm font-semibold focus:outline-none focus-visible:outline-2
+                focus-visible:outline-offset-2 ${loan.isLoanApproved ? 'bg-green-700' : 'bg-red-700'} text-white hover:bg-cerise-red-700 hover:text-slate-100 active:bg-cerise-red-800 active:text-slate-300 focus-visible:outline-cerise-red-900`}
+              onClick={loan.isLoanApproved ? () => repayLoan(loan) : undefined}
             >
-              Cancel Request
+              {loan.isLoanApproved ? 'Repay' : 'Cancel Loan'}
             </button>
           </div>
         )
