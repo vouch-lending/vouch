@@ -9,8 +9,6 @@ contract Vouch {
 
     struct Loan {
         address borrower;
-        mapping(address => uint256) vouchedAmounts; // Track the vouch amount for each lender
-        mapping(address => uint256) repaymentShares; // Track the repayment share for each lender
         uint256 loanAmount;
         uint256 totalCommitted;
         uint256 lockedCollateral;
@@ -30,6 +28,7 @@ contract Vouch {
         string desc;
     }
 
+    mapping(address => Loan[]) public vouched;
     mapping(uint256 => Loan) public loans;
     mapping(uint256 => LoanStrings) public loanstrings;
     uint256 public loanCount;
@@ -128,13 +127,11 @@ contract Vouch {
 
         // Transfer the vouched amount to the contract
         // require(msg.sender != loan.borrower, "Borrower cannot vouch for their own loan");
-        require(loan.vouchedAmounts[msg.sender] == 0, "You have already vouched for this loan");
 
         // Update the loan amount with the vouched amount
         loan.totalCommitted = loan.totalCommitted.add(_amount);
 
-        // Add the vouched amount for the lender
-        loan.vouchedAmounts[msg.sender] = _amount;
+        vouched[msg.sender].push(loan);
 
         // TODO: check if total commited == loanAmount, if so, approve loan
         if (loan.totalCommitted == loan.loanAmount) {
@@ -201,6 +198,11 @@ contract Vouch {
     function getMeritScore(address _borrower) external view returns (uint256) {
         return meritScores[_borrower];
     }
+
+    function getVouchedLoans(address _voucher) external view returns (Loan[] memory) {
+        return vouched[_voucher];
+    }
+
 
     // Function to modify a borrower's merit score
     function modMerit(address _borrower, uint256 _modifier) external {

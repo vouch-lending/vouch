@@ -4,11 +4,9 @@ import { BrowserProvider, ethers } from 'ethers';
 import { VOUCH_ADDRESS, VOUCH_ABI } from '@/constants';
 import { Loans } from '@/types';
 import MetaMaskSDK from '@metamask/sdk';
-import Modal from '../common/Modal';
 
 const Loans: FC = () => {
   const [loanArray, setLoanArray] = useState<Loans[] | undefined>()
-  const [modal, setModal] = useState(false)
 
   useEffect(() => {
     getLoans()
@@ -20,9 +18,6 @@ const Loans: FC = () => {
     // Clear the interval when the component unmounts
     return () => clearInterval(interval);
   }, []); // The empty dependency array ensures that the effect runs only once on mount
-
-  const openModal = () => setModal(true)
-  const closeModal = () => setModal(false)
 
   const getLoans = async () => {
     const options = {
@@ -47,7 +42,6 @@ const Loans: FC = () => {
       const loanStrings = await contractInstance.loanstrings(i);
 
       if (loan[0] == '0x0000000000000000000000000000000000000000' || !loanStrings[0]) {
-        console.log(i)
         break
       }
 

@@ -29,7 +29,6 @@ describe("Vouch", function () {
 
       const loan = await contract.loans(0)
       console.log(loan)
-      // expect(await lock.unlockTime()).to.equal(unlockTime);
     });
 
   });
@@ -51,7 +50,27 @@ describe("Vouch", function () {
       const loanStrings = await contract.loanstrings(0)
       console.log(loan)
       console.log(loanStrings)
-      // expect(await lock.unlockTime()).to.equal(unlockTime);
+    });
+
+  });
+
+  describe("Vouch for a loan and check your vouched list", function () {
+    it("Should request a loan, vouch for it and ", async function () {
+      const { contract, owner } = await loadFixture(deployContract);
+
+      const loanAmount = ethers.utils.parseEther('10')
+      const loanDuration = 30
+      const twitter = 'https://twitter.com'
+      const desc = 'This is a test'
+      const telegram = 'https://telegram.com'
+      await contract.requestLoan(loanAmount, loanDuration, twitter, desc, telegram, { value: loanAmount.div(2) })
+
+      await contract.vouch(0, loanAmount.div(5), { value: loanAmount.div(5) })
+
+      const loan = await contract.loans(0)
+      const vouched = await contract.getVouchedLoans(owner.address)
+      console.log(loan)
+      console.log(vouched)
     });
 
   });

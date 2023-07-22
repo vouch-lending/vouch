@@ -1,35 +1,20 @@
-import { FC, useState } from 'react'
-import Telegram from '../icons/socials/telegram'
-import Twitter from '../icons/socials/twitter'
+import { FC } from "react"
 import Blockies from 'react-blockies';
-import { Loans } from '@/types';
-import { formatAddress } from '@/utils/format';
-import Modal from './Modal';
-import VouchModal from '../loans/VouchModal';
+import Telegram from "../icons/socials/telegram";
+import Twitter from "../icons/socials/twitter";
+import { Loans } from "@/types";
+import { formatAddress } from "@/utils/format";
 
 interface Props {
   loanArray: Loans[]
 }
 
-const Card: FC<Props> = ({ loanArray }) => {
-  const [modal, setModal] = useState(false)
-  const [loanSelected, setLoanSelected] = useState<Loans | undefined>()
-
+const UserLoans: FC<Props> = ({ loanArray }) => {
   const openURLInNewTab = (url: string) =>
-    window.open(url, '_blank');
-
-  const openModal = (loan: Loans) => {
-    setLoanSelected(loan)
-    setModal(true)
-  }
-  
-  const closeModal = () => setModal(false)
+  window.open(url, '_blank');
 
   return (
     <div className='grid grid-flow-col grid-cols-3'>
-      <Modal title={'Vouch Loan'} isOpen={modal} closeModal={closeModal}>
-        {loanSelected && <VouchModal loan={loanSelected} />}
-      </ Modal>
       {loanArray.map((loan) => {
         return (
           <div className="flex flex-col w-80 p-3 outline rounded-xl h-auto">
@@ -93,10 +78,9 @@ const Card: FC<Props> = ({ loanArray }) => {
             </div>
             <p className='text-[#334155] text-xs font-normal pb-4'>{loan.description}</p>
             <button className="group items-center justify-center rounded-full py-2 px-4 text-sm font-semibold focus:outline-none focus-visible:outline-2
-                focus-visible:outline-offset-2 bg-black text-white hover:bg-cerise-red-700 hover:text-slate-100 active:bg-cerise-red-800 active:text-slate-300 focus-visible:outline-cerise-red-900"
-              onClick={() => openModal(loan)}
+                focus-visible:outline-offset-2 bg-red-700 text-white hover:bg-cerise-red-700 hover:text-slate-100 active:bg-cerise-red-800 active:text-slate-300 focus-visible:outline-cerise-red-900"
             >
-              Vouch
+              Cancel Request
             </button>
           </div>
         )
@@ -105,4 +89,4 @@ const Card: FC<Props> = ({ loanArray }) => {
   )
 }
 
-export default Card
+export default UserLoans
