@@ -4,7 +4,7 @@ async function main() {
     const Vouch = await ethers.getContractFactory("Vouch");
     const vouch = await Vouch.deploy();
 
-    await vouch.waitForDeployment();
+    // await vouch.();
 
     console.log("Vouch contract deployed to:", vouch.target);
 }

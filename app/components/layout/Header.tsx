@@ -33,10 +33,6 @@ const Header = () => {
   const openModal = () => setModal(true)
   const closeModal = () => setModal(false)
 
-  const submitRequestLoan = () => {
-    // amount, term, discord, telegram, twitter, description
-  }
-
   // https://www.deepshot.ai/?ref=producthunt
   return (
     <header className="py-10">

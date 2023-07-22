@@ -1,6 +1,7 @@
 import { FC, useState } from "react";
 import { MetaMaskSDK } from '@metamask/sdk';
 import { BrowserProvider, ethers } from "ethers";
+import { VOUCH_ABI, VOUCH_ADDRESS } from "@/constants";
 
 const RequestModal: FC = () => {
   // Initialize state variables to store the input values
@@ -10,7 +11,6 @@ const RequestModal: FC = () => {
   const [descriptionValue, setDescriptionValue] = useState("");
 
   const submit = async () => {
-    console.log({ telegramValue, twitterValue, amountValue, descriptionValue })
     const options = {
       injectProvider: true,
       dappMetadata: { name: "My Dapp", url: "https://mydapp.com" },
@@ -23,13 +23,12 @@ const RequestModal: FC = () => {
     await ethereum.request({ method: 'eth_requestAccounts', params: [] })
 
     const provider = new BrowserProvider(ethereum as any);
-  
-    const contractInstance = new ethers.Contract('contractAddress', 'contractABI', provider);
 
-    const result = await contractInstance.myMethod('param1', 'param2');
+    const contractInstance = new ethers.Contract(VOUCH_ADDRESS, VOUCH_ABI, await provider.getSigner());
 
-    console.log('result')
-
+    const result = await contractInstance.requestLoan(ethers.parseEther(amountValue), 30, twitterValue, descriptionValue, telegramValue, { value: ethers.parseEther((parseInt(amountValue) / 2).toString()) });
+    // const result = await contractInstance.loans(0)
+    console.log(result)
   }
 
   return (
