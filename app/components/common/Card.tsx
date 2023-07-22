@@ -32,7 +32,7 @@ const Card: FC<Props> = ({ loanArray }) => {
       </ Modal>
       {loanArray.map((loan) => {
         return (
-          <div className="flex flex-col w-80 p-3 outline rounded-xl h-auto">
+          <div className="flex flex-col w-80 p-3 outline rounded-xl h-auto" key={loan.id}>
             {/* header */}
             <div className='flex items-center gap-4 w-full'>
               {/* icon */}

@@ -17,7 +17,7 @@ const UserVouches: FC<Props> = ({ vouchArray }) => {
     <div className='grid grid-flow-col grid-cols-3'>
       {vouchArray.map((loan) => {
         return (
-          <div className="flex flex-col w-80 p-3 outline rounded-xl h-auto">
+          <div className="flex flex-col w-80 p-3 outline rounded-xl h-auto" key={loan.id}>
             {/* header */}
             <div className='flex items-center gap-4 w-full'>
               {/* icon */}
