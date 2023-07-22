@@ -51,6 +51,8 @@ const Loans: FC = () => {
         break
       }
 
+      const meritScore = await contractInstance.meritScores(loan[0])
+
       allLoans.push({
         id: i,
         borrower: loanStrings[0],
@@ -58,7 +60,7 @@ const Loans: FC = () => {
         telegram: loanStrings[2],
         apr: loan[5].toString(),
         term: loan[4].toString(),
-        meritScore: '10',
+        meritScore: meritScore.toString(),
         loanAmount: ethers.formatEther(loan[1].toString()),
         totalCommitted: ethers.formatEther(loan[2].toString()),
         description: loanStrings[3],

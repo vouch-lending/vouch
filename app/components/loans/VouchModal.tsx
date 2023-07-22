@@ -36,7 +36,7 @@ const VouchModal: FC<Props> = ({ loan }) => {
     <div className="flex flex-col gap-3">
       <div className='flex justify-evenly py-3'>
         <div className='flex flex-col items-center'>
-          <h1 className='font-black text-lg'>243</h1>
+          <h1 className='font-black text-lg'>{loan.meritScore}</h1>
           <p className='font-normal text-base'>Merit Score</p>
         </div>
         <div className='flex flex-col items-center'>
