@@ -14,6 +14,7 @@ import type { VerifyReply } from "../../pages/api/verify";
 import Link from 'next/link'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import SismoButton from './SismoButton'
 
 const Header = () => {
   const [address, setAddress] = useState('')
@@ -32,8 +33,8 @@ const Header = () => {
 
     const addr = await ethereum.request({ method: 'eth_requestAccounts', params: [] })
 
-    if (addr && Array.isArray(addr) && addr.length > 0) { 
-      setAddress(addr[0]) 
+    if (addr && Array.isArray(addr) && addr.length > 0) {
+      setAddress(addr[0])
       toast.success(
         <div>Wallet successfully connected!</div>
         , {
@@ -145,7 +146,9 @@ const Header = () => {
             </div>
           </div>
           <div className="flex items-center gap-x-5 md:gap-x-8">
-            <div className="hidden md:block">
+            <div className="hidden md:flex items-center gap-4">
+              <SismoButton />
+              <span>|</span>
               {proof ? <button
                 className="flex items-center gap-3 rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 "
               >

@@ -5,7 +5,7 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@sismo-core/sismo-connect-solidity/contracts/libs/SismoLib.sol";
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 contract Vouch is SismoConnect{
     using SafeMath for uint256; // Apply SafeMath to all uint256 types
@@ -71,11 +71,6 @@ contract Vouch is SismoConnect{
         uint256 telegramId = SismoConnectHelper.getUserId(result, AuthType.TELEGRAM);
         uint256[] memory evmAccountIds = SismoConnectHelper.getUserIds(result, AuthType.EVM_ACCOUNT);
         
-        console.log("Vault ID: %s", vaultId);
-        console.log("Telegram ID: %s", telegramId);
-        console.log("First EVM Account ID: %s", evmAccountIds[0]);
-        console.log("Second EVM Account ID: %s", evmAccountIds[1]);
-
         emit ResponseVerified(result);
     }
 

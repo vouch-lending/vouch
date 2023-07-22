@@ -19,3 +19,18 @@ body {
 .w-half-section {
   width: 33%;
 }
+
+.sismoConnectButton:hover {
+  background-color: rgb(241 245 249) !important;
+  color: rgb(15 23 42) !important;
+}
+
+.sismoConnectButtonText {
+  font-weight: bold !important;
+  font-size: 0.875rem !important;
+  font-family: inherit;
+}
+
+.sismoConnectButtonLogo {
+  transform: scale(1.5) !important;
+}
