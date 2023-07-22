@@ -80,7 +80,11 @@ contract Vouch {
         newLoan.totalCommitted = 0;
         newLoan.lockedCollateral = lockedCollateral;
         newLoan.loanDuration = _loanDuration;
-        newLoan.interestRate = 5;
+        {
+            uint256 apr = 25;
+            uint256 meritScore = meritScores[msg.sender];
+            newLoan.interestRate = 5 + (apr.mul(meritScore.sub(1))).div(99);
+        }
         newLoan.creationTime = block.timestamp;
         newLoan.repaymentTime = 0;
         newLoan.repaymentAmount = 0;
