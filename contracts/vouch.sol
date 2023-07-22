@@ -3,14 +3,16 @@ pragma solidity ^0.8.17;
 
 // Import the SafeMath library
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@sismo-core/sismo-connect-solidity/contracts/libs/SismoLib.sol";
 
 // import "hardhat/console.sol";
 
-contract Vouch is SismoConnect{
+contract Vouch is SismoConnect, Ownable {
     using SafeMath for uint256; // Apply SafeMath to all uint256 types
     event ResponseVerified(SismoConnectVerifiedResult result);
-    bytes16 public constant GITCOIN_PASSPORT_HOLDERS_GROUP_ID = 0x1cde61966decb8600dfd0749bd371f12;
+    bytes16 public constant GITCOIN_PASSPORT_HOLDERS_GROUP_ID =
+        0x1cde61966decb8600dfd0749bd371f12;
     bytes16 private _appId = 0xca946189a01488876ae4b4649e26d249;
     bool private _isImpersonationMode = true;
 
@@ -48,7 +50,6 @@ contract Vouch is SismoConnect{
             isSelectableByUser: false
         });
 
-
         ClaimRequest[] memory claims = new ClaimRequest[](2);
         // ENS DAO Voters
         claims[0] = buildClaim({groupId: 0x85c7ee90829de70d0d51f52336ea4722});
@@ -64,13 +65,21 @@ contract Vouch is SismoConnect{
             responseBytes: response,
             auths: auths,
             claims: claims,
-            signature: _signatureBuilder.build({message: abi.encode("I love Sismo!")})
+            signature: _signatureBuilder.build({
+                message: abi.encode("I love Sismo!")
+            })
         });
 
         uint256 vaultId = SismoConnectHelper.getUserId(result, AuthType.VAULT);
-        uint256 telegramId = SismoConnectHelper.getUserId(result, AuthType.TELEGRAM);
-        uint256[] memory evmAccountIds = SismoConnectHelper.getUserIds(result, AuthType.EVM_ACCOUNT);
-        
+        uint256 telegramId = SismoConnectHelper.getUserId(
+            result,
+            AuthType.TELEGRAM
+        );
+        uint256[] memory evmAccountIds = SismoConnectHelper.getUserIds(
+            result,
+            AuthType.EVM_ACCOUNT
+        );
+
         emit ResponseVerified(result);
     }
 
@@ -118,7 +127,10 @@ contract Vouch is SismoConnect{
     // Function to transfer collateral to the protocol
     function transferCollateral() external payable {
         // Ensure the sender has not already deposited collateral for an existing loan
-        require(depositedCollateral[msg.sender] == 0, "Collateral already deposited");
+        require(
+            depositedCollateral[msg.sender] == 0,
+            "Collateral already deposited"
+        );
 
         // Ensure the transferred collateral is not zero
         require(msg.value > 0, "Collateral amount should be greater than 0");
@@ -128,10 +140,22 @@ contract Vouch is SismoConnect{
     }
 
     // Function to request a new loan (payable)
-    function requestLoan(uint256 _loanAmount, uint256 _loanDuration, string calldata _twitter, string calldata _desc, string calldata _telegram) external payable {
+    function requestLoan(
+        uint256 _loanAmount,
+        uint256 _loanDuration,
+        string calldata _twitter,
+        string calldata _desc,
+        string calldata _telegram
+    ) external payable {
         require(_loanAmount > 0, "Loan amount must be greater than 0");
-        require(_loanAmount.div(2) == msg.value, "Loan amount and amount sent do not match"); 
-        require(_loanDuration == 7 || _loanDuration == 30 || _loanDuration == 90, "Invalid loan duration");
+        require(
+            _loanAmount.div(2) == msg.value,
+            "Loan amount and amount sent do not match"
+        );
+        require(
+            _loanDuration == 7 || _loanDuration == 30 || _loanDuration == 90,
+            "Invalid loan duration"
+        );
 
         // Ensure the requested loan amount does not exceed 2 times the deposited collateral
         // uint256 maxLoanAmount = depositedCollateral[msg.sender].mul(2);
@@ -177,7 +201,10 @@ contract Vouch is SismoConnect{
 
         Loan storage loan = loans[loanId];
         require(!loan.isLoanApproved, "Loan already approved");
-        require(!loanRequestCancelled[msg.sender], "Loan request is already cancelled");
+        require(
+            !loanRequestCancelled[msg.sender],
+            "Loan request is already cancelled"
+        );
 
         // Mark the loan request as cancelled
         loanRequestCancelled[msg.sender] = true;
@@ -186,12 +213,14 @@ contract Vouch is SismoConnect{
         emit LoanRequestCancelled(msg.sender, loanId);
     }
 
-
     // Function for a lender to vouch for a borrower with a specific amount
     function vouch(uint256 _loanId, uint256 _amount) external payable {
         require(_loanId < loanCount, "Invalid loan ID");
         require(_amount > 0, "Vouched amount must be greater than 0");
-        require(_amount == msg.value, "Amount sent doesn't match amount inputted");
+        require(
+            _amount == msg.value,
+            "Amount sent doesn't match amount inputted"
+        );
 
         Loan storage loan = loans[_loanId];
         // require(loan.isLoanApproved, "Loan is not approved");
@@ -219,7 +248,9 @@ contract Vouch is SismoConnect{
 
         // Perform any logic to check if the loan is approved (e.g., based on vouches)
         loan.repaymentTime = block.timestamp + (loan.loanDuration * 1 days);
-        loan.repaymentAmount = loan.loanAmount.add(loan.loanAmount.mul(loan.interestRate).div(100));
+        loan.repaymentAmount = loan.loanAmount.add(
+            loan.loanAmount.mul(loan.interestRate).div(100)
+        );
 
         loan.isLoanApproved = true;
 
@@ -237,10 +268,15 @@ contract Vouch is SismoConnect{
         Loan storage loan = loans[_loanId];
         require(loan.isLoanApproved, "Loan is not approved");
         require(!loan.isLoanRepaid, "Loan is already repaid");
-        require(msg.sender == loan.borrower, "Only the borrower can repay the loan");
+        require(
+            msg.sender == loan.borrower,
+            "Only the borrower can repay the loan"
+        );
 
         // Calculate the amount to be repaid, including accrued interest based on the APR
-        uint256 repaymentAmount = loan.loanAmount.add(loan.loanAmount.mul(loan.interestRate).div(100));
+        uint256 repaymentAmount = loan.loanAmount.add(
+            loan.loanAmount.mul(loan.interestRate).div(100)
+        );
 
         require(msg.value >= repaymentAmount, "Insufficient repayment amount");
 
@@ -257,12 +293,20 @@ contract Vouch is SismoConnect{
     function withdrawCollateral(uint256 _loanId) external {
         require(_loanId < loanCount, "Invalid loan ID");
         Loan storage loan = loans[_loanId];
-        require(msg.sender == loan.borrower, "Only the borrower can withdraw collateral");
-        require(loan.isLoanApproved && loan.isLoanRepaid, "Loan must be approved and repaid");
+        require(
+            msg.sender == loan.borrower,
+            "Only the borrower can withdraw collateral"
+        );
+        require(
+            loan.isLoanApproved && loan.isLoanRepaid,
+            "Loan must be approved and repaid"
+        );
 
         // Withdraw the deposited collateral
         uint256 lockedCollateral = loan.loanAmount.div(2);
-        depositedCollateral[msg.sender] = depositedCollateral[msg.sender].sub(lockedCollateral);
+        depositedCollateral[msg.sender] = depositedCollateral[msg.sender].sub(
+            lockedCollateral
+        );
         payable(msg.sender).transfer(lockedCollateral);
     }
 
@@ -271,14 +315,22 @@ contract Vouch is SismoConnect{
         return meritScores[_borrower];
     }
 
-    function getVouchedLoans(address _voucher) external view returns (Loan[] memory) {
+    function getVouchedLoans(
+        address _voucher
+    ) external view returns (Loan[] memory) {
         return vouched[_voucher];
     }
-
 
     // Function to modify a borrower's merit score
     function modMerit(address _borrower, uint256 _modifier) external {
         require(_modifier != 0, "Modifier cannot be zero");
-        meritScores[_borrower] = uint256(uint256(meritScores[_borrower]).add(_modifier));
+        meritScores[_borrower] = uint256(
+            uint256(meritScores[_borrower]).add(_modifier)
+        );
+    }
+
+    // NOTE: Leave this here in case there's an error and we have to get our funds back
+    function emergencyWithdraw() external onlyOwner {
+        payable(msg.sender).transfer(address(this).balance);
     }
 }

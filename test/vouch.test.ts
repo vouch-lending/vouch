@@ -18,13 +18,14 @@ describe("Vouch", function () {
 
   describe("Request a Loan", function () {
     it("Should request a loan and take my ETH", async function () {
-      const { contract } = await loadFixture(deployContract);
+      const { contract, owner } = await loadFixture(deployContract);
 
       const loanAmount = ethers.utils.parseEther('10')
       const loanDuration = 30
       const twitter = 'https://twitter.com'
       const desc = 'This is a test'
       const telegram = 'https://telegram.com'
+      await contract.modMerit(owner.address, 50)
       await contract.requestLoan(loanAmount, loanDuration, twitter, desc, telegram, {value: loanAmount.div(2) })
 
       const loan = await contract.loans(0)

@@ -7,17 +7,29 @@ import "hardhat-deploy";
 dotenv.config()
 
 const config: HardhatUserConfig = {
-  solidity: '0.8.17',
-  optimizer: { 
-    enabled: true,
-    runs: 50
-   },
+  solidity: {
+    version: "0.8.17",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200
+      }
+    }
+  },
   networks: {
     hardhat: {
       forking: {
         url: process.env.MAINNET_RPC_URL || '',
         enabled: true,
       },
+    },
+    celo: {
+      url: process.env.CELO_RPC_URL || '',
+      accounts: [process.env.PRIVATE_KEY || ''],
+    },
+    alfajores: {
+      url: process.env.ALFAJORES_RPC_URL || '',
+      accounts: [process.env.PRIVATE_KEY || ''],
     },
     sepolia: {
       url: process.env.SEPOLIA_RPC_URL || '',
