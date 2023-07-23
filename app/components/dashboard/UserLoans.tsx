@@ -20,7 +20,7 @@ const UserLoans: FC<Props> = ({ loanArray }) => {
   const repayLoan = async (loan: LoansExtended) => {
     const options = {
       injectProvider: true,
-      dappMetadata: { name: "My Dapp", url: "https://mydapp.com" },
+      dappMetadata: { name: "Vouch", url: "https://vouch-inky.vercel.app" },
     }
 
     const MMSDK = new MetaMaskSDK(options)
@@ -40,7 +40,7 @@ const UserLoans: FC<Props> = ({ loanArray }) => {
       <div>Transaction sent successfully! <a href={`https://celoscan.io/tx/${result.hash}`} className="underline">View here</a>.</div>
       , {
         position: "top-right",
-        autoClose: 5000,
+        autoClose: 3000,
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,

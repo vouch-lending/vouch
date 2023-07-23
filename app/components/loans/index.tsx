@@ -1,9 +1,8 @@
 import { FC, useEffect, useState } from 'react'
 import Card from '../common/Card'
-import { BrowserProvider, ethers } from 'ethers';
+import { JsonRpcProvider, ethers } from 'ethers';
 import { VOUCH_ADDRESS, VOUCH_ABI } from '@/constants';
 import { Loans } from '@/types';
-import MetaMaskSDK from '@metamask/sdk';
 
 const Loans: FC = () => {
   const [loanArray, setLoanArray] = useState<Loans[] | undefined>()
@@ -20,30 +19,19 @@ const Loans: FC = () => {
   }, []); // The empty dependency array ensures that the effect runs only once on mount
 
   const getLoans = async () => {
-    const options = {
-      injectProvider: true,
-      dappMetadata: { name: "My Dapp", url: "https://mydapp.com" },
-    }
+    const provider = new JsonRpcProvider(process.env.NEXT_PUBLIC_QUICKNODE_RPC_URL)
 
-    const MMSDK = new MetaMaskSDK(options)
-
-    const ethereum = MMSDK.getProvider()
-
-    await ethereum.request({ method: 'eth_requestAccounts', params: [] })
-
-    const provider = new BrowserProvider(ethereum as any);
-
-    const contractInstance = new ethers.Contract(VOUCH_ADDRESS, VOUCH_ABI, await provider.getSigner());
+    const contractInstance = new ethers.Contract(VOUCH_ADDRESS, VOUCH_ABI, provider);
 
     let i = 0
     let allLoans: Loans[] = []
+
     while (true) {
       const loan = await contractInstance.loans(i);
       const loanStrings = await contractInstance.loanstrings(i);
 
-      if (loan[0] == '0x0000000000000000000000000000000000000000' || !loanStrings[0]) {
+      if (loan[0] == '0x0000000000000000000000000000000000000000')
         break
-      }
 
       const meritScore = await contractInstance.meritScores(loan[0])
 
@@ -59,17 +47,16 @@ const Loans: FC = () => {
         totalCommitted: ethers.formatEther(loan[2].toString()),
         description: loanStrings[3],
       })
-      
+
       i++;
     }
 
     setLoanArray(allLoans)
-    // console.log(loan, loanStrings)
   }
 
   return (
     <div className="h-screen-minus">
-      
+
       {/* <div className='flex items-center justify-between gap-8'>
         <h1 className='text-l'>Active Loans</h1>
         <button

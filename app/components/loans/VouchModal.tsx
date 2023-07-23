@@ -15,7 +15,7 @@ const VouchModal: FC<Props> = ({ loan }) => {
   const submit = async () => {
     const options = {
       injectProvider: true,
-      dappMetadata: { name: "My Dapp", url: "https://mydapp.com" },
+      dappMetadata: { name: "Vouch", url: "https://vouch-inky.vercel.app" },
     }
 
     const MMSDK = new MetaMaskSDK(options)
@@ -34,7 +34,7 @@ const VouchModal: FC<Props> = ({ loan }) => {
       <div>Transaction sent successfully! <a href={`https://celoscan.io/tx/${result.hash}`} className="underline">View here</a>.</div>
       , {
         position: "top-right",
-        autoClose: 5000,
+        autoClose: 3000,
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,

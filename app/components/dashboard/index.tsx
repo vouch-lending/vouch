@@ -25,7 +25,7 @@ const Dashboard: FC = () => {
   const getLoans = async () => {
     const options = {
       injectProvider: true,
-      dappMetadata: { name: "My Dapp", url: "https://mydapp.com" },
+      dappMetadata: { name: "Vouch", url: "https://vouch-inky.vercel.app" },
     }
 
     const MMSDK = new MetaMaskSDK(options)

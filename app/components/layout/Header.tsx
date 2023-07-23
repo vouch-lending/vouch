@@ -24,7 +24,7 @@ const Header = () => {
   const connect = async () => {
     const options = {
       injectProvider: true,
-      dappMetadata: { name: "My Dapp", url: "https://mydapp.com" },
+      dappMetadata: { name: "Vouch", url: "https://vouch-inky.vercel.app" },
     }
 
     const MMSDK = new MetaMaskSDK(options)
@@ -39,7 +39,7 @@ const Header = () => {
         <div>Wallet successfully connected!</div>
         , {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 3000,
           hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
@@ -61,7 +61,7 @@ const Header = () => {
     setProof(result)
     toast.success('You have been verified successfully!', {
       position: "top-right",
-      autoClose: 5000,
+      autoClose: 3000,
       hideProgressBar: true,
       closeOnClick: true,
       pauseOnHover: true,

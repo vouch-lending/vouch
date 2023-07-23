@@ -12,9 +12,35 @@ const RequestModal: FC = () => {
   const [descriptionValue, setDescriptionValue] = useState("");
 
   const submit = async () => {
+    if (!telegramValue.toLowerCase().startsWith('https://t.me/')) return toast.error(
+      <div className="text-sm font-medium">Invalid Telegram format... Try https://t.me/[USERNAME]</div>
+      , {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+
+    if (!twitterValue.toLowerCase().startsWith('https://twitter.com/')) return toast.error(
+      <div className="text-sm font-medium">Invalid Twitter format... Try https://twitter.com/[USERNAME]</div>
+      , {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+
     const options = {
       injectProvider: true,
-      dappMetadata: { name: "My Dapp", url: "https://mydapp.com" },
+      dappMetadata: { name: "Vouch", url: "https://vouch-inky.vercel.app" },
     }
 
     const MMSDK = new MetaMaskSDK(options)
@@ -28,12 +54,12 @@ const RequestModal: FC = () => {
     const contractInstance = new ethers.Contract(VOUCH_ADDRESS, VOUCH_ABI, await provider.getSigner());
 
     const result = await contractInstance.requestLoan(ethers.parseEther(amountValue), 30, twitterValue, descriptionValue, telegramValue, { value: ethers.parseEther((parseInt(amountValue) / 2).toString()) });
-    // const result = await contractInstance.loans(0)
+
     toast.success(
       <div>Transaction sent successfully! <a href={`https://celoscan.io/tx/${result.hash}`} className="underline">View here</a>.</div>
       , {
         position: "top-right",
-        autoClose: 5000,
+        autoClose: 3000,
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
