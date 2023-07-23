@@ -14,7 +14,7 @@ const About: FC = () => {
         >
           Check Open Loans
         </Link>
-        <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" className="group inline-flex ring-1 items-center justify-center rounded-full py-4 px-8 text-sm focus:outline-none ring-cerise-red-200 text-slate-700 hover:text-slate-900 hover:ring-slate-300 active:bg-slate-100 active:text-slate-600 focus-visible:outline-blue-600 focus-visible:ring-slate-300"><svg aria-hidden="true" className="h-3 w-3 flex-none fill-cerise-red-600 group-active:fill-current"><path d="m9.997 6.91-7.583 3.447A1 1 0 0 1 1 9.447V2.553a1 1 0 0 1 1.414-.91L9.997 5.09c.782.355.782 1.465 0 1.82Z"></path></svg><span className="ml-3">Watch video</span></a>
+        <a href="https://youtu.be/Uai06kQ8Dqg" target="_blank" rel="noopener noreferrer" className="group inline-flex ring-1 items-center justify-center rounded-full py-4 px-8 text-sm focus:outline-none ring-cerise-red-200 text-slate-700 hover:text-slate-900 hover:ring-slate-300 active:bg-slate-100 active:text-slate-600 focus-visible:outline-blue-600 focus-visible:ring-slate-300"><svg aria-hidden="true" className="h-3 w-3 flex-none fill-cerise-red-600 group-active:fill-current"><path d="m9.997 6.91-7.583 3.447A1 1 0 0 1 1 9.447V2.553a1 1 0 0 1 1.414-.91L9.997 5.09c.782.355.782 1.465 0 1.82Z"></path></svg><span className="ml-3">Watch video</span></a>
       </div>
     </div>
   )
